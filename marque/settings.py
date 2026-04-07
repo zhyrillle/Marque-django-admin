@@ -11,19 +11,21 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Load .env variables
+load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# SECURITY
+SECRET_KEY = os.getenv("SECRET_KEY")
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-tf4jhsh1a$++$+pli$4mahjw6%-2&w3!klb)dtxs%)^ng8b%ca'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -42,6 +44,10 @@ INSTALLED_APPS = [
     'organizations',
     'departments',
     'colleges',
+    'users',
+    'students',
+    'events',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -79,8 +85,13 @@ WSGI_APPLICATION = 'marque.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': 'marque_db',
+        'ENFORCE_SCHEMA': False,
+        'DEFAULT_AUTO_FIELD': 'django.db.models.BigAutoField',
+        'CLIENT': {
+            'host': os.getenv("MONGO_URI"),
+        }
     }
 }
 

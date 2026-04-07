@@ -30,4 +30,5 @@ router.register(r'organizations', OrganizationViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/events/', include('events.urls')),
 ]
