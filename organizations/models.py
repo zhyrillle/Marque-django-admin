@@ -1,11 +1,8 @@
-# organizations/models.py
 from django.db import models
 from students.models import Student
 from departments.models import Department
+import uuid
 
-# -----------------------
-# Organization
-# -----------------------
 class Organization(models.Model):
     ORG_TYPES = [
         ("Unit Organization", "Unit Organization"),
@@ -13,8 +10,13 @@ class Organization(models.Model):
         ("FAESO Organization", "FAESO Organization"),
     ]
 
-    _id = models.CharField(primary_key=True, max_length=24)
-    department_id = models.ForeignKey(Department, on_delete=models.DO_NOTHING)
+    _id = models.CharField(
+        primary_key=True, 
+        max_length=36, 
+        default=uuid.uuid4, 
+        editable=False
+    )
+    department_id = models.CharField(max_length=24)
     org_name = models.CharField(max_length=255)
     org_type = models.CharField(max_length=50, choices=ORG_TYPES)
     description = models.TextField()
@@ -33,9 +35,6 @@ class Organization(models.Model):
         return self.org_name
 
 
-# -----------------------
-# Org Officer
-# -----------------------
 class OrgOfficer(models.Model):
     ROLE_CHOICES = ['Committee', 'Manager', 'President']
 
@@ -53,9 +52,6 @@ class OrgOfficer(models.Model):
         return f"{self.student_id} - {self.role}"
 
 
-# -----------------------
-# Join Request
-# -----------------------
 class JoinRequest(models.Model):
     STATUS_CHOICES = ['Pending', 'Approved', 'Rejected']
 
@@ -72,9 +68,6 @@ class JoinRequest(models.Model):
         return f"{self.student_id} request to join {self.organization_id}"
 
 
-# -----------------------
-# Followed Organizations
-# -----------------------
 class FollowedOrgs(models.Model):
     user_id = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
     organization_id = models.ForeignKey(Organization, on_delete=models.DO_NOTHING)
