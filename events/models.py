@@ -3,10 +3,16 @@ from django.db import models
 from students.models import Student
 from organizations.models import Organization
 
-
 # -----------------------
 # Event
 # -----------------------
+def default_reminders():
+    return {
+        "twentyFourHours": False,
+        "oneHour": False,
+        "conclusion": False
+    }
+
 class Event(models.Model):
     EVENT_TYPES = ["Event", "Sub-Event"]
     STATUS_CHOICES = ["Upcoming", "Ongoing", "Concluded", "Cancelled"]
@@ -27,9 +33,7 @@ class Event(models.Model):
     status = models.CharField(max_length=50, choices=[(s, s) for s in STATUS_CHOICES], default="Upcoming")
     is_mandatory = models.BooleanField(default=False)
 
-    reminders_twentyFourHours = models.BooleanField(default=False)
-    reminders_oneHour = models.BooleanField(default=False)
-    reminders_conclusion = models.BooleanField(default=False)
+    remindersSent = djongo_models.JSONField(default=default_reminders)
 
     class Meta:
         db_table = "events"
@@ -37,6 +41,40 @@ class Event(models.Model):
 
     def __str__(self):
         return self.event_name
+
+    # =========================
+    # ✅ VIRTUAL BOOLEAN FIELDS
+    # =========================
+
+    @property
+    def reminders_twentyFourHours(self):
+        return (self.remindersSent or {}).get("twentyFourHours", False)
+
+    @reminders_twentyFourHours.setter
+    def reminders_twentyFourHours(self, value):
+        if not self.remindersSent:
+            self.remindersSent = default_reminders()
+        self.remindersSent["twentyFourHours"] = bool(value)
+
+    @property
+    def reminders_oneHour(self):
+        return (self.remindersSent or {}).get("oneHour", False)
+
+    @reminders_oneHour.setter
+    def reminders_oneHour(self, value):
+        if not self.remindersSent:
+            self.remindersSent = default_reminders()
+        self.remindersSent["oneHour"] = bool(value)
+
+    @property
+    def reminders_conclusion(self):
+        return (self.remindersSent or {}).get("conclusion", False)
+
+    @reminders_conclusion.setter
+    def reminders_conclusion(self, value):
+        if not self.remindersSent:
+            self.remindersSent = default_reminders()
+        self.remindersSent["conclusion"] = bool(value)
 
 
 # -----------------------
