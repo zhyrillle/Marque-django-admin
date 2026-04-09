@@ -22,7 +22,7 @@ class ObjectIdField(serializers.Field):
 class EventSerializer(serializers.ModelSerializer):
     _id = ObjectIdField(required=False)
     event_image_file = serializers.ImageField(write_only=True, required=False)
-    organization_id = serializers.CharField(max_length=24)
+    organization_id = serializers.ChoiceField(choices=[])
     remindersSent = serializers.JSONField(required=False)  # ✅ keep as JSONField
 
     class Meta:
@@ -48,6 +48,21 @@ class EventSerializer(serializers.ModelSerializer):
             'reminders_oneHour',
             'reminders_conclusion',
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        choices = []
+
+        for org in Organization.objects.all():
+            try:
+                org_id = str(org._id)
+                org_name = getattr(org, 'org_name', None) or "Unnamed Org"
+                choices.append((org_id, org_name))
+            except Exception as e:
+                print("ORG ERROR:", e)
+
+        self.fields['organization_id'].choices = choices
 
     def validate_organization_id(self, value):
         if not ObjectId.is_valid(value):
@@ -114,6 +129,17 @@ class EventSerializer(serializers.ModelSerializer):
             validated_data['event_image'] = result['secure_url']
 
         return super().update(instance, validated_data)
+    
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+
+        if '_id' in ret and not isinstance(ret['_id'], str):
+            ret['_id'] = str(ret['_id'])
+
+        if 'organization_id' in ret and not isinstance(ret['organization_id'], str):
+            ret['organization_id'] = str(ret['organization_id'])
+
+        return ret
 
 
 class AttendanceLogSerializer(serializers.ModelSerializer):
