@@ -4,7 +4,6 @@ from organizations.models import Organization
 from bson import ObjectId
 from .utils import filter_by_object_id
 
-
 class ObjectIdField(serializers.Field):
     """Handles serialization/deserialization of MongoDB ObjectId fields."""
 
@@ -23,7 +22,7 @@ class EventSerializer(serializers.ModelSerializer):
     _id = ObjectIdField(required=False)
     event_image_file = serializers.ImageField(write_only=True, required=False)
     organization_id = serializers.ChoiceField(choices=[])
-    remindersSent = serializers.JSONField(required=False)  # ✅ keep as JSONField
+    remindersSent = serializers.JSONField(required=False)  
 
     class Meta:
         model = Event
@@ -73,13 +72,8 @@ class EventSerializer(serializers.ModelSerializer):
 
         return value
 
-    # =========================
-    # ✅ CREATE
-    # =========================
     def create(self, validated_data):
         image_file = validated_data.pop('event_image_file', None)
-
-        # ✅ Extract virtual fields
         reminders = validated_data.get('remindersSent', {}) or {}
 
         reminders["twentyFourHours"] = validated_data.pop(
@@ -104,11 +98,8 @@ class EventSerializer(serializers.ModelSerializer):
 
         return super().create(validated_data)
 
-    # =========================
-    # ✅ UPDATE (fix duplicate creation)
-    # =========================
     def update(self, instance, validated_data):
-        # ✅ Always preserve the original _id
+        # Always preserve the original _id
         validated_data['_id'] = instance._id
     
         image_file = validated_data.pop('event_image_file', None)

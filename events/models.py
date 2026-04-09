@@ -3,9 +3,7 @@ from django.db import models
 from students.models import Student
 from organizations.models import Organization
 
-# -----------------------
-# Event
-# -----------------------
+
 def default_reminders():
     return {
         "twentyFourHours": False,
@@ -42,10 +40,6 @@ class Event(models.Model):
     def __str__(self):
         return self.event_name
 
-    # =========================
-    # ✅ VIRTUAL BOOLEAN FIELDS
-    # =========================
-
     @property
     def reminders_twentyFourHours(self):
         return (self.remindersSent or {}).get("twentyFourHours", False)
@@ -76,10 +70,6 @@ class Event(models.Model):
             self.remindersSent = default_reminders()
         self.remindersSent["conclusion"] = bool(value)
 
-
-# -----------------------
-# Attendance Log
-# -----------------------
 class AttendanceLog(models.Model):
     STATUS_CHOICES = ['Present', 'Absent', 'Late']
     PHOTO_STATUS_CHOICES = ['pending', 'verified', 'rejected']
@@ -109,10 +99,6 @@ class AttendanceLog(models.Model):
     def __str__(self):
         return f"{self.user_id} - {self.event_id}"
 
-
-# -----------------------
-# Bookmark
-# -----------------------
 class Bookmark(models.Model):
     _id = djongo_models.ObjectIdField()
 
@@ -127,10 +113,6 @@ class Bookmark(models.Model):
     def __str__(self):
         return f"{self.user_id} bookmarked {self.event_id}"
 
-
-# -----------------------
-# Feedback
-# -----------------------
 class Feedback(models.Model):
     _id = djongo_models.ObjectIdField()
 

@@ -28,7 +28,7 @@ class EventRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = '_id'
     lookup_url_kwarg = 'pk'
 
-    # ✅ Override to convert string to ObjectId
+    # Override to convert string to ObjectId
     def get_object(self):
         _id = self.kwargs.get(self.lookup_url_kwarg)
         try:
