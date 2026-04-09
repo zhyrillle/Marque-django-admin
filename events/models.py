@@ -17,7 +17,7 @@ class Event(models.Model):
     EVENT_TYPES = ["Event", "Sub-Event"]
     STATUS_CHOICES = ["Upcoming", "Ongoing", "Concluded", "Cancelled"]
 
-    _id = djongo_models.ObjectIdField()  # explicit PK to prevent int() cast error
+    _id = djongo_models.ObjectIdField(primary_key=True)  # explicit PK to prevent int() cast error
 
     organization_id = models.CharField(max_length=24)  # stored as string
     event_name = models.CharField(max_length=255)

@@ -105,40 +105,37 @@ class EventSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     # =========================
-    # ✅ UPDATE
+    # ✅ UPDATE (fix duplicate creation)
     # =========================
     def update(self, instance, validated_data):
+        # ✅ Always preserve the original _id
+        validated_data['_id'] = instance._id
+    
         image_file = validated_data.pop('event_image_file', None)
-
         reminders = instance.remindersSent or {}
-
+    
         if 'reminders_twentyFourHours' in validated_data:
             reminders["twentyFourHours"] = validated_data.pop('reminders_twentyFourHours')
-
+    
         if 'reminders_oneHour' in validated_data:
             reminders["oneHour"] = validated_data.pop('reminders_oneHour')
-
+    
         if 'reminders_conclusion' in validated_data:
             reminders["conclusion"] = validated_data.pop('reminders_conclusion')
-
+    
         validated_data['remindersSent'] = reminders
-
+    
         if image_file:
             import cloudinary.uploader
             result = cloudinary.uploader.upload(image_file)
             validated_data['event_image'] = result['secure_url']
-
-        return super().update(instance, validated_data)
     
+        return super().update(instance, validated_data)
+
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-
-        if '_id' in ret and not isinstance(ret['_id'], str):
-            ret['_id'] = str(ret['_id'])
-
-        if 'organization_id' in ret and not isinstance(ret['organization_id'], str):
-            ret['organization_id'] = str(ret['organization_id'])
-
+        ret['_id'] = str(instance._id)
+        ret['organization_id'] = str(instance.organization_id)
         return ret
 
 

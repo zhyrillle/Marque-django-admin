@@ -7,6 +7,7 @@ from .serializers import (
     BookmarkSerializer,
     FeedbackSerializer,
 )
+from bson import ObjectId
 
 
 class EventListCreateView(generics.ListCreateAPIView):
@@ -24,7 +25,16 @@ class EventListCreateView(generics.ListCreateAPIView):
 class EventRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
+    lookup_field = '_id'
+    lookup_url_kwarg = 'pk'
 
+    # ✅ Override to convert string to ObjectId
+    def get_object(self):
+        _id = self.kwargs.get(self.lookup_url_kwarg)
+        try:
+            return Event.objects.get(_id=ObjectId(_id))
+        except Event.DoesNotExist:
+            raise NotFound("Event not found.")
 
 class AttendanceLogListCreateView(generics.ListCreateAPIView):
     queryset = AttendanceLog.objects.all()
