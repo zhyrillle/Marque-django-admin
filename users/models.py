@@ -19,7 +19,7 @@ class User(models.Model):
 
     class Meta:
         db_table = "users"
-        managed = False
+        managed = True
 
     def __str__(self):
         return f"{self.firstname} {self.lastname}"
