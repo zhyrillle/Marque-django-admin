@@ -124,8 +124,6 @@ class LoginView(APIView):
 
 
 class MeView(APIView):
-    """Returns the currently logged-in user's info."""
-
     def get(self, request):
         user = request.user
         return Response({

@@ -3,12 +3,10 @@ from users.authentication import MongoUser
 
 
 def is_mongo_user(user):
-    """Returns True only if the user is a real authenticated MongoUser."""
     return isinstance(user, MongoUser)
 
 
 class IsAdmin(BasePermission):
-    """Allow access only to Admin users."""
     message = 'Only Admins are allowed to perform this action.'
 
     def has_permission(self, request, view):
@@ -16,10 +14,6 @@ class IsAdmin(BasePermission):
 
 
 class IsAdminOrReadOnly(BasePermission):
-    """
-    Allow read access (GET, HEAD, OPTIONS) to any authenticated user.
-    Allow write access (POST, PUT, PATCH, DELETE) only to Admins.
-    """
     message = 'Only Admins are allowed to modify data.'
 
     def has_permission(self, request, view):

@@ -7,10 +7,6 @@ import jwt
 
 
 class MongoUser:
-    """
-    A lightweight user object built from a MongoDB document.
-    Mimics enough of Django's user interface for DRF to work.
-    """
     def __init__(self, doc):
         self.id = str(doc['_id'])
         self.username = doc.get('username')
